@@ -61,8 +61,9 @@ namespace Newsletter.Controllers
             {
                 if (IEIA.CommonUtil.RegexUtilities.IsValidEmail(recipient["Email"].ToString().Trim()))
                 {
-                    mailMessage = mailMessage.Replace("{0}", recipient["Title"].ToString().Trim()).Replace("{1}", recipient["Name"].ToString().Trim());
-                    await SendEmailAsync(subject, mailMessage, recipient["Email"].ToString().Trim(), fileAttachments);
+                    string mailBody = string.Format("Dear {0} {1},<br><br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
+                    //mailMessage = string.Format("Dear {0} {1},<br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
+                    await SendEmailAsync(subject, mailBody, recipient["Email"].ToString().Trim(), fileAttachments);
 
                     noOfEmailsProcessed++;
                 }
