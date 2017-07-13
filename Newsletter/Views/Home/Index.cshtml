@@ -1,31 +1,106 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿
+@{
+    ViewBag.Title = "Send Newsletter";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<h2>@ViewBag.Title</h2>
 
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
+    <div id="mailMessanger">@ViewBag.Message</div>
+    <form id="newsletterForm" action="@Url.Action("SendNewsletter", "Home")" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+        <!--<div class="col-xs-12">
+            <label class="control-label">Recipient(s):</label>
+            <input type="text" id="recipient" name="recipient" class="form-control" />
+        </div>-->
+        <div class="col-xs-12">
+            <label class="control-label">Recipients: [<small><span style="color: red;">Upload format: </span><em>Ensure that your recipient list has the following column headers (Title, Name, Email)</em></small>]</label>
+            <input type="file" id="recipient" name="recipient" />
+        </div>
+        <div class="col-xs-12">
+            <label class="control-label">Subject:</label>
+            <input type="text" id="subject" name="subject" class="form-control" />
+        </div>
+        <div class="col-xs-12">
+            <label class="control-label">Message:</label>
+            <textarea id="mailMessage" name="mailMessage" rows="10"></textarea>
+        </div>
+        <div class="col-xs-12">
+            <label class="control-label">Attachment:</label>
+            <input type="file" id="FileAttachments" name="FileAttachments" multiple />
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary">Send e-mail</button>
+            </div>
+        </div>
+    </form>
 </div>
+
+@section Scripts {
+    @*<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>*@
+    <script src="@Url.Content("~/Content/assets/tinymce/tinymce.min.js")"></script>
+    <script>
+        tinymce.init({ selector: 'textarea' });
+
+        $(function () {
+            var msg = $('#mailMessanger').html().trim();
+            if (msg.length > 0) {
+                if (msg.indexOf('Error') != -1) {
+                    showMsg('#mailMessanger', 'danger', 'Error', msg);
+                } else {
+                    showMsg('#mailMessanger', 'info', 'Information', msg);
+                }
+            }
+            //
+            //$('form#newsletterForm').submit(function (e) {
+            //    e.preventDefault();
+
+            //    try {
+            //        //Declaring new Form Data Instance
+            //        var formData = new FormData($(this)[0]);
+            //        //Serializing all For Input Values (not files!) in an Array Collection so that we can iterate this collection later.
+            //        var params = $(this).serializeArray();
+            //        console.log(params);
+
+            //        //Getting Files Collection
+            //        var attachment = $("#mailAttachment")[0].files;
+
+            //        if (attachment) {
+            //            console.log('b4 add');
+            //            $.each($('input[name="FileAttachments[]"]'), function (i, obj) {
+            //                $.each(obj.files, function (j, file) {
+            //                    formData.append('attachment[' + i + ']', file);
+            //                })
+            //            });
+            //        }
+            //        console.log('after add');
+            //        //Now Looping the parameters for all form input fields and assigning them as Name Value pairs.
+            //        $(params).each(function (index, element) {
+            //            formData.append(element.name, element.value);
+            //        });
+
+            //        $.ajax({
+            //            url: $(this).attr('action'),
+            //            type: 'POST',
+            //            data: formData,
+            //            async: false,
+            //            success: function (result) {
+            //                result = JSON.parse(result);
+
+            //                showMsg('#mailMessanger', result.type, result.header, result.message);
+            //            },
+            //            error: function (data) {
+            //                showMsg('#mailMessanger', 'danger', 'Error', data.responseText);
+            //            },
+            //            cache: false,
+            //            contentType: false,
+            //            processData: false
+            //        });
+            //    } catch (err) {
+            //        showMsg('#mailMessanger', 'danger', 'Error', err.responseText);
+            //    }
+            //});
+        });
+    </script>
+}

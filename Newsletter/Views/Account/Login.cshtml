@@ -1,0 +1,167 @@
+﻿@using Newsletter.Models
+@model LoginViewModel
+@{
+    Layout = null;
+    ViewBag.Title = "Log in";
+}
+
+<!DOCTYPE html>
+<!--[if IE 9]>         <html class="ie9 no-focus" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html class="no-focus" lang="en">
+ <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+
+    <title>Newsletter - IEI-ANCHOR PENSION MANAGERS LIMITED</title>
+
+    <meta name="description" content="Newsletter - IEI-ANCHOR PENSION MANAGERS LIMITED created by Department">
+    <meta name="author" content="pixelcave">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Icons -->
+    <!-- The following icons can be replaced with your own, they are used by desktop and mobile browsers -->
+    <link rel="shortcut icon" href="@Url.Content("~/Content/assets/img/favicons/favicon.png")">
+
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-16x16.png")" sizes="16x16">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-32x32.png")" sizes="32x32">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-96x96.png")" sizes="96x96">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-160x160.png")" sizes="160x160">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-192x192.png")" sizes="192x192">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-57x57.png")">
+    <link rel="apple-touch-icon" sizes="60x60" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-60x60.png")">
+    <link rel="apple-touch-icon" sizes="72x72" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-72x72.png")">
+    <link rel="apple-touch-icon" sizes="76x76" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-76x76.png")">
+    <link rel="apple-touch-icon" sizes="114x114" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-114x114.png")">
+    <link rel="apple-touch-icon" sizes="120x120" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-120x120.png")">
+    <link rel="apple-touch-icon" sizes="144x144" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-144x144.png")">
+    <link rel="apple-touch-icon" sizes="152x152" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-152x152.png")">
+    <link rel="apple-touch-icon" sizes="180x180" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-180x180.png")">
+    <!-- END Icons -->
+    <!-- Stylesheets -->
+    <!-- Web fonts -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400italic,600,700%7COpen+Sans:300,400,400italic,600,700">
+
+    <!-- Bootstrap and OneUI CSS framework -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/bootstrap.min.css")">
+    <link rel="stylesheet" id="css-main" href="@Url.Content("~/Content/assets/css/oneui.css")">
+
+    <!-- You can include a specific file from css/themes/ folder to alter the default color theme of the template. eg: -->
+    <!-- <link rel="stylesheet" id="css-theme" href="@Url.Content("~/Content/assets/css/themes/flat.min.css")"> -->
+    <!-- END Stylesheets -->
+</head>
+<body>
+    <!-- Login Content -->
+    <div class="content overflow-hidden">
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+                <!-- Login Block -->
+                <div class="block block-themed animated fadeIn">
+                    <div class="block-header bg-primary">
+                        <h3 class="block-title">Login</h3>
+                    </div>
+                    <div class="block-content block-content-full block-content-narrow">
+                        <!-- Login Title -->
+                        <h1 class="h2 font-w600 push-30-t push-5">Newsletters <small>v1.0</small></h1>
+                        <p>Welcome, please login.</p>
+                        <!-- END Login Title -->
+                        <!-- Login Form -->
+                        <!-- jQuery Validation (.js-validation-login class is initialized in js/pages/base_pages_login.js) -->
+                        <!-- For more examples you can check out https://github.com/jzaefferer/jquery-validation -->
+                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "js-validation-login form-horizontal push-30-t push-50", role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <div class="form-material form-material-primary">
+                                        <label for="login-username">Username</label>
+                                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <div class="form-material form-material-primary">
+                                        <label for="login-password">Password</label>
+                                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-12 col-sm-6 col-md-4">
+                                    <button class="btn btn-block btn-primary" type="submit"><i class="si si-login pull-right"></i> Log in</button>
+                                </div>
+                            </div>
+                        }
+                        <!-- END Login Form -->
+                    </div>
+                </div>
+                <!-- END Login Block -->
+            </div>
+        </div>
+    </div>
+    <!-- END Login Content -->
+    <!-- Login Footer -->
+    <div class="push-10-t text-center animated fadeInUp">
+        <small class="text-muted font-w600"><span class="">2017</span> &copy; Newsletters 1.0</small>
+        <div class="row">
+            <div style="padding-top: 10px;">
+                <img src="@Url.Content("~/Content/assets/img/logo.png")" />
+            </div>
+        </div>
+    </div>
+    <!-- END Login Footer -->
+    
+    <!-- OneUI Core JS: jQuery, Bootstrap, slimScroll, scrollLock, Appear, CountTo, Placeholder, Cookie and App.js -->
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.slimscroll.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.scrollLock.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.appear.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.countTo.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.placeholder.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/js.cookie.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/app.js")"></script>
+
+    <!-- Page JS Plugins -->
+    <script src="@Url.Content("~/Content/assets/js/plugins/jquery-validation/jquery.validate.min.js")"></script>
+
+    <!-- Page JS Code -->
+    <script src="@Url.Content("~/Content/assets/js/pages/base_pages_login.js")"></script>
+
+    <style>
+        form input:focus + label {
+            top: 100%; 
+            margin-top: -16px;
+        }
+    </style>
+
+    <script>
+        $(function () {
+            $('#UserName').focus();
+            $(html).find('a').each(function () {
+                bookmark($(this).attr("title"), $(this).attr("href"));
+            });
+
+            function bookmark(title, href) {
+                if (window.sidebar && window.sidebar.addPanel) { // Mozilla Firefox Bookmark
+                    window.sidebar.addPanel(title, href, '');
+                } else if (window.external && ('AddFavorite' in window.external)) { // IE Favorite
+                    window.external.AddFavorite(href, title);
+                } else if (window.opera && window.print) { // Opera Hotlist
+                    this.title = title;
+                    return true;
+                } else { // webkit - safari/chrome
+                    alert('Press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != - 1 ? 'Command/Cmd' : 'CTRL') + ' + D to bookmark this page.');
+                }
+            }     
+        });
+    </script>
+</body>
+</html>
+

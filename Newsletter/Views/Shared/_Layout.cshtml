@@ -1,42 +1,190 @@
 ﻿<!DOCTYPE html>
-<html>
+<!--[if IE 9]>         <html class="ie9 no-focus" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html class="no-focus" lang="en">
+<!--<![endif]-->
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <meta charset="utf-8">
+
+    <title>@ViewBag.Title :: Newsletters - IEI-ANCHOR PENSION MANAGERS LIMITED</title>
+
+    <meta name="description" content="Newsletters - IEI-ANCHOR PENSION MANAGERS LIMITED created by pixelcave and published on Themeforest">
+    <meta name="author" content="ICT Department, IEI-Anchor Pension Managers Limited">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Icons -->
+    <!-- The following icons can be replaced with your own, they are used by desktop and mobile browsers -->
+    <link rel="shortcut icon" href="@Url.Content("~/Content/assets/img/favicons/favicon.png")">
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/Custom.css?v2")" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-16x16.png")" sizes="16x16">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-32x32.png")" sizes="32x32">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-96x96.png")" sizes="96x96">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-160x160.png")" sizes="160x160">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/assets/img/favicons/favicon-192x192.png")" sizes="192x192">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-57x57.png")">
+    <link rel="apple-touch-icon" sizes="60x60" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-60x60.png")">
+    <link rel="apple-touch-icon" sizes="72x72" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-72x72.png")">
+    <link rel="apple-touch-icon" sizes="76x76" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-76x76.png")">
+    <link rel="apple-touch-icon" sizes="114x114" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-114x114.png")">
+    <link rel="apple-touch-icon" sizes="120x120" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-120x120.png")">
+    <link rel="apple-touch-icon" sizes="144x144" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-144x144.png")">
+    <link rel="apple-touch-icon" sizes="152x152" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-152x152.png")">
+    <link rel="apple-touch-icon" sizes="180x180" href="@Url.Content("~/Content/assets/img/favicons/apple-touch-icon-180x180.png")">
+    <!-- END Icons -->
+    <!-- Stylesheets -->
+    <!-- Web fonts -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400italic,600,700%7COpen+Sans:300,400,400italic,600,700">
+
+    <!-- Bootstrap and OneUI CSS framework -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/bootstrap.min.css")">
+    <link rel="stylesheet" id="css-main" href="@Url.Content("~/Content/assets/css/oneui.css")">
+
+    <!-- You can include a specific file from css/themes/ folder to alter the default color theme of the template. eg: -->
+    <!-- <link rel="stylesheet" id="css-theme" href="@Url.Content("~/Content/assets/css/themes/flat.min.css")"> -->
+    <!-- END Stylesheets -->
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+    <!-- Page Container -->
+    <div id="page-container" class="sidebar-l side-scroll header-navbar-fixed">
+        <!-- Header -->
+        <header id="header-navbar">
+            <div class="content-mini content-mini-full content-boxed">
+                <!-- Header Navigation Right -->
+                <ul class="nav-header pull-right">
+                    <li>
+                        <!-- Layout API, functionality initialized in App() -> uiLayoutApi() -->
+                        <button class="btn btn-default btn-image" title="Logout" onclick="javascript:document.getElementById('logoutForm').submit()" type="button">
+                            <i class="si si-logout"></i>&nbsp;
+                            @if (string.IsNullOrEmpty(IEIA.CommonUtil.Web.SessionVar.GetString("displayName")))
+                            {
+                                HttpContext.Current.Response.Redirect("~/Account/Login");
+                            }
+                            else
+                            {
+                                @IEIA.CommonUtil.Web.SessionVar.GetString("displayName");
+                            }
+                        </button>
+                    </li>
                 </ul>
+                <!-- END Header Navigation Right -->
+                <!-- Header Navigation Left -->
+                <ul class="nav-header pull-left">
+                    <li class="header-content">
+                        <a class="h5" href="@Url.Action("DailyAttendance", "Home")">
+                            <img src="@Url.Content("~/Content/assets/img/logo-small.png")" style="height: 40px;" />
+                            <span class="h4 font-w600 text-primary-dark">Newsletters <small>v1.0</small></span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- END Header Navigation Left -->
             </div>
-        </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </header>
+        <!-- END Header -->
+        <!-- Main Container -->
+        <main id="main-container">
+            <!-- Sub Header -->
+            <div class="bg-gray-lighter visible-xs">
+                <div class="content-mini content-boxed">
+                    <button class="btn btn-block btn-default visible-xs push" data-toggle="collapse" data-target="#sub-header-nav">
+                        <i class="fa fa-navicon push-5-r"></i>Menu
+                    </button>
+                </div>
+            </div>
+            <div class="bg-primary-lighter collapse navbar-collapse remove-padding" id="sub-header-nav">
+                <div class="content-mini content-boxed">
+                    <input type="hidden" id="currentNavTitle" value="@ViewBag.Title" />
+                    <ul id="mainNav" class="nav nav-pills nav-sub-header push">
+                        <li>
+                            <a href="@Url.Action("Index", "Home")">Send Newsletter</a>
+                        </li>
+                        <li>
+                            <a href="javascript:document.getElementById('logoutForm').submit()">
+                                <i class="si si-logout push-5-r"></i>Log out
+                            </a>
+                        </li>
+                        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                        }
+                    </ul>
+                </div>
+            </div>
+            <!-- END Sub Header -->
+            <!-- Page Content -->
+            <div class="content content-boxed">
+                @RenderBody()
+            </div>
+            <!-- END Page Content -->
+        </main>
+        <!-- END Main Container -->
+        <!-- Footer -->
+        <footer id="page-footer" class="bg-body font-s12">
+            <div class="content-mini content-mini-full content-boxed clearfix push-15">
+                <div class="pull-right">
+                    Powered by <span class="font-w600">ICT Department, IEI-Anchor Pension Managers Limited</span>
+                </div>
+                <div class="pull-left">
+                    <span class="font-w600">Newsletter 1.0</span> &copy; 2017
+                </div>
+            </div>
         </footer>
+        <!-- END Footer -->
     </div>
+    <!-- END Page Container -->
+    <!-- OneUI Core JS: jQuery, Bootstrap, slimScroll, scrollLock, Appear, CountTo, Placeholder, Cookie and App.js -->
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.slimscroll.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.scrollLock.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.appear.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.countTo.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/jquery.placeholder.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/core/js.cookie.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/app.js")"></script>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    <!-- Page Plugins -->
+    <script src="@Url.Content("~/Content/assets/js/plugins/chartjs/Chart.min.js")"></script>
+
+    <!-- Page JS Code -->
+    <script src="@Url.Content("~/Content/assets/js/pages/base_pages_dashboard_v2.js")"></script>
+    <script>
+        jQuery(function () {
+            // Init page helpers (CountTo plugin)
+            App.initHelpers('appear-countTo');
+
+            var currentNavTitle = $('#currentNavTitle').val();
+            var currentNavLink = $('ul#mainNav').find('li [data-nav-title="' + currentNavTitle + ' "]');
+
+            $('ul#mainNav li').each(function () {
+                $(this).removeClass("active");
+            });
+
+            $(currentNavLink).addClass("active");
+        });
+
+        window.getParameterByName = function (name, url) {
+            // Credit: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/901144#901144
+
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        window.showMsg = function (element, type, header, msg) {
+            var alert = '<div class="alert alert-' + type + ' alert-dismissable"><button type= "button" class="close" data- dismiss="alert" aria- hidden="true">×</button ><h3 class="font-w300 push-15">' + header + '</h3><p>' + msg + '</p></div >';
+            $(element).html(alert);
+            $(element).show();
+        }
+
+    </script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>
