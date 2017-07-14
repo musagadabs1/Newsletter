@@ -14,15 +14,17 @@ namespace Newsletter.Controllers
 {
     public class HomeController : Controller
     {
+        class SendNewsletterCallResult
+        {
+            public int NoOfFailedMessages;
+        }
+
         [ValidateInput(false)]
         [HttpPost]
         public async Task<ActionResult> SendNewsletter(HttpPostedFileBase recipient, string subject, string mailMessage, HttpPostedFileBase[] fileAttachments = null)
         {
             try
             {
-                //SendEmail(subject, mailMessage, recipient, fileAttachments);
-                ViewBag.Message = "Mail sent to recipients";
-
                 // begin validations
                 if (recipient == null)
                     throw new Exception("Recipient file must be uploaded");
@@ -42,7 +44,13 @@ namespace Newsletter.Controllers
                     throw new Exception("Column Name is required in the recipients file uploaded.");
                 // end validations
 
-                await DispatchEmailsAsync(recipients, subject, mailMessage, fileAttachments);
+                SendNewsletterCallResult result = new SendNewsletterCallResult();
+                await DispatchEmailsAsync(result, recipients, subject, mailMessage, fileAttachments);
+
+                if (result.NoOfFailedMessages > 0)
+                    ViewBag.Message = string.Format("{0} of {1} email was sent. {2} failed to deliver.", recipients.Rows.Count - result.NoOfFailedMessages, recipients.Rows.Count, result.NoOfFailedMessages);
+                else
+                    ViewBag.Message = "Mail was sent to all recipients.";
 
                 return View();
             }
@@ -53,17 +61,21 @@ namespace Newsletter.Controllers
             }
         }
 
-        private async Task<bool> DispatchEmailsAsync(DataTable recipients, string subject, string mailMessage, HttpPostedFileBase[] fileAttachments = null)
+        private async Task<bool> DispatchEmailsAsync(SendNewsletterCallResult result, DataTable recipients, string subject, string mailMessage, HttpPostedFileBase[] fileAttachments = null)
         {
             int noOfEmailsProcessed = 0, noOfEmailsPerHour = int.Parse(ConfigurationManager.AppSettings["NoOfEmailsPerHour"].ToString());
             DateTime dt = DateTime.Now;
+
+            int noOfFailedMessages = 0;
+
             foreach (DataRow recipient in recipients.Rows)
             {
                 if (IEIA.CommonUtil.RegexUtilities.IsValidEmail(recipient["Email"].ToString().Trim()))
                 {
                     string mailBody = string.Format("Dear {0} {1},<br><br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
                     //mailMessage = string.Format("Dear {0} {1},<br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
-                    await SendEmailAsync(subject, mailBody, recipient["Email"].ToString().Trim(), fileAttachments);
+                    if (!await SendEmailAsync(subject, mailBody, recipient["Email"].ToString().Trim(), fileAttachments))
+                        noOfFailedMessages++;
 
                     noOfEmailsProcessed++;
                 }
@@ -77,6 +89,8 @@ namespace Newsletter.Controllers
                     noOfEmailsProcessed = 0;
                 }
             }
+
+            result.NoOfFailedMessages = noOfFailedMessages;
 
             return true;
         }
@@ -108,12 +122,13 @@ namespace Newsletter.Controllers
                 mailBody = mailBody +
                             "<p><strong>Thank you for choosing IEI-ANCHOR PENSIONS.</strong></p>" +
                             "<img src=\"https://ieianchorpensions.com/images/logo2.png\" alt=\"IEIA-Logo\" />" +
-                            "<p>https://twitter.com/ieiapensionmgrs<br/>" +
-                                "https://www.facebook.com/anchorpensions/<br/>" +
-                                "https://www.instagram.com/ieianchorpensions/<br/>" +
-                                "https://plus.google.com/110719286991854279316/<br/>" +
-                                "https://www.youtube.com/channel/UCyXZnwdv_jcXyNeFfBfhvEw<br/>" +
-                                "https://www.linkedin.com/company-beta/16194771" +
+                            "<p>Phone: 08165722731, 08078450652, 08139882060</p>" +
+                            "<p><a href=\"https://twitter.com/ieiapensionmgrs\" title=\"IEI-Anchor Pension Managers Limited\">https://twitter.com/ieiapensionmgrs</a><br/>" +
+                                "<a href=\"https://www.facebook.com/anchorpensions/\" title=\"IEI-Anchor Pension Managers Limited\">https://www.facebook.com/anchorpensions/</a><br/>" +
+                                "<a href=\"https://www.instagram.com/ieianchorpensions/\" title=\"IEI-Anchor Pension Managers Limited\">https://www.instagram.com/ieianchorpensions/</a><br/>" +
+                                "<a href=\"https://plus.google.com/110719286991854279316/\" title=\"IEI-Anchor Pension Managers Limited\">https://plus.google.com/110719286991854279316/</a><br/>" +
+                                "<a href=\"https://www.youtube.com/channel/UCyXZnwdv_jcXyNeFfBfhvEw\" title=\"IEI-Anchor Pension Managers Limited\">https://www.youtube.com/channel/UCyXZnwdv_jcXyNeFfBfhvEw</a><br/>" +
+                                "<a href=\"https://www.linkedin.com/company-beta/16194771\" title=\"IEI-Anchor Pension Managers Limited\">https://www.linkedin.com/company-beta/16194771</a>" +
                             "</p>" +
                             "<p>" +
                                 "<strong>Disclaimer Notice</strong><br>" +
@@ -178,7 +193,7 @@ namespace Newsletter.Controllers
             catch (Exception ex)
             {
                 HomeController.LogError(ex, HttpContext.Server.MapPath("~/Error_Log.txt"));
-                throw ex;
+                return false;
             }
         }
 
@@ -192,7 +207,7 @@ namespace Newsletter.Controllers
 
                 if (fileExtension == ".xls" || fileExtension == ".xlsx")
                 {
-                    string fileLocation = Path.Combine(Server.MapPath("~/Content/Uploads/Recipients"), Request.Files[fileControlID].FileName);
+                    string fileLocation = Path.Combine(Server.MapPath("~/Content/Uploads/Recipients"), IEIA.CommonUtil.Web.SessionVar.GetString("displayName") + "_" + Request.Files[fileControlID].FileName);
                     if (System.IO.File.Exists(fileLocation))
                     {
                         try
