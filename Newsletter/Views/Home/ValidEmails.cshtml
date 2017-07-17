@@ -1,0 +1,51 @@
+﻿@model System.Collections.Generic.List<Newsletter.Controllers.Customer>
+@{
+    ViewBag.Title = "ValidEmails";
+}
+
+<div class="row">
+
+    <h2>@ViewBag.Title</h2>
+    <hr />
+
+    <div id="messanger"></div>
+    <button type="button" class="btn btn-default pull-right exportToExcel"><i class="fa fa-file-excel-o"></i> Export to Excel</button>
+    <div id="printArea">
+        <table id="newsletters" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Title</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int i = 1; }
+                @foreach(Newsletter.Controllers.Customer customer in Model)
+                {
+                    <tr>
+                        <td>@i.ToString()</td>
+                        <td>@customer.Title</td>
+                        <td>@customer.Name</td>
+                        <td>@customer.Email</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <button type="button" class="btn btn-default pull-right exportToExcel"><i class="fa fa-file-excel-o"></i> Export to Excel</button>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/datatables/jquery.dataTables.min.js")"></script>
+    <script>
+        $(function () {
+            $('button#exportToExcel').click(() => {
+                var html = $('#printArea').html();
+                window.open('data:application/vnd.ms-excel,' + encodeURIComponent(html));
+            });
+        });
+    </script>
+}
+

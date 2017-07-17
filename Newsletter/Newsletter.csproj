@@ -1286,6 +1286,8 @@
     <Content Include="Views\Account\AccessDenied.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\SendNewsletter.cshtml" />
+    <Content Include="Views\Home\Newsletters.cshtml" />
+    <Content Include="Views\Home\ValidEmails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

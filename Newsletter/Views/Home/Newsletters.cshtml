@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewBag.Title = "Newsletters";
+}
+
+<div class="row">
+
+    <h2>@ViewBag.Title</h2>
+    <hr />
+
+    <div class="row">
+        <form id="searchForm" action="#" method="post" class="form-horizontal" role="form">
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                <label class="control-label">Start Date:</label>
+                <input type="date" id="StartDate" name="StartDate" class="form-control" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                <label class="control-label">End Date:</label>
+                <input type="date" id="EndDate" name="EndDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button id="exportToExcel" type="button" class="btn btn-default pull-right"><i class="fa fa-file-excel-o"></i> Export to Excel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="messanger"></div>
+
+    <div id="printArea">
+        <table id="newsletters" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>DATE</th>
+                    <th>RECIPIENT</th>
+                    <th>SUBJECT</th>
+                    <th>STATUS</th>
+                    <th>SENDER</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center" colspan="6">There was no result to display</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/datatables/jquery.dataTables.min.js")"></script>
+    <script>
+        $(function () {
+            $('button#exportToExcel').click(() => {
+                var html = $('#printArea').html();
+                window.open('data:application/vnd.ms-excel,' + encodeURIComponent(html));
+            });
+
+            $('#searchForm').submit(function (e) {
+                e.preventDefault();
+                try {
+                    showMsg('#messanger', 'info', 'Search Complete', 'Generating newsletters sent for the period.');
+                    var $newsletters = $('#newsletters tbody');
+                    $newsletters.html('');
+                    $.post('@Url.Action("FetchNewsLetters", "Home")', $(this).serialize())
+                            .then((data) => {
+                                if (data) {
+                                    var sn = 1;
+                                    $.each(data, (i, v) => {
+                                        $newsletters.append('<tr><td>' + sn.toString() + '</td><td>' + data[i].DateSent + '</td><td>' + data[i].Recipient + '</td><td>' + data[i].Subject + '</td><td>' + data[i].Status + '</td><td>' + data[i].Sender + '</td></tr>');
+                                        sn++;
+                                    });
+                                    $('#newsletters').dataTable();
+                                    $('#messanger').hide();
+                                } else {
+                                    $newsletters.html('<td class="text-center" colspan="6">No record found.</td>');
+                                    showMsg('#messanger', 'info', 'Search Complete', 'Sorry, there was no result found for the selected parameters.');
+                                }
+                            }).fail(function (err) {
+                                showMsg('#messanger', 'info', 'Oops!', err);
+                            });
+                } catch (err) {
+                    showMsg('#messanger', 'info', 'Oops!', err.responseText);
+                }
+            });
+        });
+    </script>
+}

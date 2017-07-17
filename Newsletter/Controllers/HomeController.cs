@@ -1,4 +1,6 @@
-﻿using System;
+﻿using IEIA.CommonUtil.Data;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
@@ -9,9 +11,27 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Linq;
 
 namespace Newsletter.Controllers
 {
+    public class MessageHistory
+    {
+        public string Recipient { get; set; }
+        public string Subject { get; set; }
+        public string MailBody { get; set; }
+        public string DateSent { get; set; }
+        public string Sender { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class Customer
+    {
+        public string Title { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
+
     public class HomeController : Controller
     {
         class SendNewsletterCallResult
@@ -68,14 +88,28 @@ namespace Newsletter.Controllers
 
             int noOfFailedMessages = 0;
 
+            DataAccess dataAccess = new DataAccess(DataProvider.MsSQLServer, ConfigurationManager.ConnectionStrings["AlertDataConnectionString"].ConnectionString);
+            string reference = Guid.NewGuid().ToString();
             foreach (DataRow recipient in recipients.Rows)
             {
-                if (IEIA.CommonUtil.RegexUtilities.IsValidEmail(recipient["Email"].ToString().Trim()))
+                string email = recipient["Email"].ToString().Trim();
+                if (IEIA.CommonUtil.RegexUtilities.IsValidEmail(email))
                 {
                     string mailBody = string.Format("Dear {0} {1},<br><br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
-                    //mailMessage = string.Format("Dear {0} {1},<br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
-                    if (!await SendEmailAsync(subject, mailBody, recipient["Email"].ToString().Trim(), fileAttachments))
+                    var isMailSent = await SendEmailAsync(subject, mailBody, email, fileAttachments);
+                    if (!isMailSent)
                         noOfFailedMessages++;
+
+                    dataAccess.Execute("INSERT INTO MessageHistory (MessageType, Recipient, Message, Subject, IsSent, IsDelivered, Ref, ProviderID, UserName) VALUES ('E', @Recipient, @Message, @Subject, @IsSent, 0, @Ref, @ProviderID, @UserName)",
+                                    new DataParam[] {
+                                    new DataParam("@Recipient", email),
+                                    new DataParam("@Message", mailBody),
+                                    new DataParam("@Subject", subject),
+                                    new DataParam("@IsSent", isMailSent),
+                                    new DataParam("@Ref", reference),
+                                    new DataParam("@ProviderID", 3),
+                                    new DataParam("@UserName", Session["userName"])
+                                });
 
                     noOfEmailsProcessed++;
                 }
@@ -89,6 +123,7 @@ namespace Newsletter.Controllers
                     noOfEmailsProcessed = 0;
                 }
             }
+            dataAccess = null;
 
             result.NoOfFailedMessages = noOfFailedMessages;
 
@@ -99,6 +134,60 @@ namespace Newsletter.Controllers
         {
             ViewBag.Message = string.Empty;
             return View();
+        }
+
+        public ActionResult Newsletters()
+        {
+            return View();
+        }
+
+        public ActionResult ValidEmails()
+        {
+            DataAccess dataAccess = new DataAccess(DataProvider.MsSQLServer, ConfigurationManager.ConnectionStrings["AlertDataConnectionString"].ConnectionString);
+            DataTable table = dataAccess.Fetch("Exec sp_GenerateValidEmail", true);
+
+            List<Customer> customers = new List<Customer>();
+            if (table.Rows.Count > 0)
+            {
+                customers = table.AsEnumerable()
+                                            .Select(row => new Customer()
+                                            {
+                                                Title = row["Title"].ToString(),
+                                                Name = row["Name"].ToString(),
+                                                Email = row["Email"].ToString()
+                                            }).ToList();
+            }
+            return View(customers);
+        }
+
+        public JsonResult FetchNewsLetters(DateTime startDate, DateTime endDate)
+        {
+            DataAccess dataAccess = new DataAccess(DataProvider.MsSQLServer, ConfigurationManager.ConnectionStrings["AlertDataConnectionString"].ConnectionString);
+            DataTable table = dataAccess.Fetch(@"SELECT Recipient, Subject, Message, DateTimeSent, UserName, IsSent, IsSent 
+                                                FROM MessageHistory 
+                                                WHERE FORMAT(DateTimeSent, 'yyyy-MM-dd') BETWEEN @StartDate AND @EndDate AND MessageType = 'E'",
+                                                true,
+                                                new DataParam[] {
+                                                    new DataParam("@StartDate", string.Format("{0:yyyy-MM-dd}", startDate)),
+                                                    new DataParam("@EndDate", string.Format("{0:yyyy-MM-dd}", endDate))
+                                                });
+
+            List<MessageHistory> newsletters = new List<MessageHistory>();
+            if (table.Rows.Count > 0)
+            {
+                newsletters = table.AsEnumerable()
+                                            .Select(row => new MessageHistory()
+                                            {
+                                                Recipient = row["Recipient"].ToString(),
+                                                Subject = row["Subject"].ToString(),
+                                                MailBody = row["Message"].ToString(),
+                                                DateSent = string.Format("{0:dd-MM-yyyy}", row["DateTimeSent"]),
+                                                Sender = row["UserName"].ToString(),
+                                                Status = (bool.Parse(row["IsSent"].ToString()) ? "Sent" : "Failed")
+                                            }).ToList();
+            }
+
+            return Json(newsletters);
         }
 
         public async Task<bool> SendEmailAsync(string subject, string mailBody, string recipients, HttpPostedFileBase[] fileAttachments = null)
@@ -207,7 +296,7 @@ namespace Newsletter.Controllers
 
                 if (fileExtension == ".xls" || fileExtension == ".xlsx")
                 {
-                    string fileLocation = Path.Combine(Server.MapPath("~/Content/Uploads/Recipients"), IEIA.CommonUtil.Web.SessionVar.GetString("displayName") + "_" + Request.Files[fileControlID].FileName);
+                    string fileLocation = Path.Combine(Server.MapPath("~/Content/Uploads/Recipients"), IEIA.CommonUtil.Web.SessionVar.GetString("userName") + "_" + Request.Files[fileControlID].FileName);
                     if (System.IO.File.Exists(fileLocation))
                     {
                         try

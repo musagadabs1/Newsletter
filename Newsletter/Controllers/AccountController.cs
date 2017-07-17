@@ -58,6 +58,7 @@ namespace Newsletter.Controllers
                     FormsAuthentication.SetAuthCookie(model.UserName, false);
 
                     Session["displayName"] = name;
+                    Session["userName"] = model.UserName;
 
 
                     if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1
