@@ -68,7 +68,7 @@ namespace Newsletter.Controllers
                 await DispatchEmailsAsync(result, recipients, subject, mailMessage, fileAttachments);
 
                 if (result.NoOfFailedMessages > 0)
-                    ViewBag.Message = string.Format("{0} of {1} email was sent. {2} failed to deliver.", recipients.Rows.Count - result.NoOfFailedMessages, recipients.Rows.Count, result.NoOfFailedMessages);
+                    ViewBag.Message = string.Format($"{recipients.Rows.Count - result.NoOfFailedMessages} of {recipients.Rows.Count} email was sent. {result.NoOfFailedMessages} failed to deliver." );
                 else
                     ViewBag.Message = "Mail was sent to all recipients.";
 
@@ -95,7 +95,7 @@ namespace Newsletter.Controllers
                 string email = recipient["Email"].ToString().Trim();
                 if (IEIA.CommonUtil.RegexUtilities.IsValidEmail(email))
                 {
-                    string mailBody = string.Format("Dear {0} {1},<br><br>{2}", recipient["Title"].ToString().Trim(), recipient["Name"].ToString().Trim(), mailMessage);
+                    string mailBody = string.Format($"Dear {recipient["Title"].ToString().Trim()} {recipient["Name"].ToString().Trim()},<br><br>{mailMessage}");
                     var isMailSent = await SendEmailAsync(subject, mailBody, email, fileAttachments);
                     if (!isMailSent)
                         noOfFailedMessages++;
